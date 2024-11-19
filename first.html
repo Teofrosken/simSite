@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Moving Blue Box</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column; /* Stack items vertically */
+            align-items: center; /* Center items horizontally */
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        form {
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <canvas id="myCanvas" width="400" height="400"></canvas>
+        <form onsubmit="return false;">
+            <input type="number" id="size" name="cellSize" placeholder="Cell size" required>
+        </form>
+        <form onsubmit="return false;">
+            <input type="number" id="width" name="Width" placeholder="Enter width" required>
+            <input type="number" id="height" name="Height" placeholder="Enter height" required>
+        </form>
+        <form onsubmit="return false;">
+            <input type="number" id="speed" name="Speed" placeholder="Steps per second" required>
+        </form>
+        <button id="updateBtn">Update</button>
+    </div>
+
+    <script>
+        // Select the canvas and button
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+        const btn = document.getElementById('updateBtn');
+
+        var lastCellSize = 16; // Last valid cell size
+        document.getElementById('size').value = 16;
+        var lastWidth = 32; // Last valid width
+        document.getElementById('width').value = 32
+        var lastHeight = 32; // Last valid height
+        document.getElementById('height').value = 32
+        var lastSpeed = 8; // Last valid height
+        document.getElementById('speed').value = 8
+
+        canvas.width = lastCellSize * lastWidth
+        canvas.height = lastCellSize * lastHeight
+        //Math.round(Math.random(1))
+        //canvas.width
+        //eval()
+        //parseInt(document.getElementById('size').value);
+        var intervalID = ""
+
+        var grid = new Array(32); // rows
+
+        for (let i = 0; i < 32; i++) {
+         grid[i] = new Array(32).fill(0); // colloms
+}
+
+        function drawGrid(width, height) {
+             grid = new Array(width);
+             for (let i = 0; i < width; i++) {
+                 grid[i] = new Array(height).fill(0);
+                    for (let j = 0; j < height; j++) {
+                        grid[i][j] = Math.round(Math.random());
+                      }
+               }
+           display(); // Call display to render the initial grid
+        }
+
+        // Add an event listener for the button click
+        btn.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            lastCellSize = parseInt(document.getElementById('size').value);
+            lastWidth = parseInt(document.getElementById('width').value);
+            lastHeight = parseInt(document.getElementById('height').value);
+            lastSpeed = parseInt(document.getElementById('speed').value);
+
+            canvas.width = lastCellSize * lastWidth
+            canvas.height = lastCellSize * lastHeight
+
+            if (intervalID) {
+                clearInterval(intervalID);
+            }
+            intervalID = setInterval(simulate, 1000 / lastSpeed);
+
+            drawGrid(lastWidth, lastHeight)
+
+            //drawGrid(newWidth, newHeight)
+        });
+
+        function drawCell(x, y, size) {
+            ctx.fillRect(x, y, size, size);
+        }
+
+        function display() {
+            ctx.clearRect(0, 0, lastWidth * lastCellSize, lastHeight * lastCellSize)
+            for (let j = 0; j <lastHeight; j++) {
+                for (let i = 0; i <lastWidth; i++) {
+                    //drawCell(i * lastCellSize, j * lastCellSize, lastCellSize)
+                    if (grid[i][j] == 1) {
+                        drawCell(i * lastCellSize, j * lastCellSize, lastCellSize)
+                    }
+                }
+            }
+        }
+
+        function getNeighbors(x, y) {
+            let num = 0;
+            for (let h = -1; h <= 1; h++) {
+                for (let w = -1; w <= 1; w++) {
+                // Skip the cell itself
+                    if (h === 0 && w === 0) continue;
+
+                     const neighborX = x + w;
+                     const neighborY = y + h;
+
+                    // Check if the neighbor is within bounds
+                    if (neighborX >= 0 && neighborX < lastWidth && neighborY >= 0 && neighborY < lastHeight) {
+                        num += grid[neighborX][neighborY]; // Count the live neighbors
+                        }
+                    }
+        }
+            return num;
+        }
+
+        drawGrid(lastWidth, lastHeight);
+
+        function simulate() {
+            let grid2 = grid.map(row => row.slice());
+            for (let j = 0; j < lastHeight; j++) {
+               for (let i = 0; i < lastWidth; i++) {
+              let neighbors1 = getNeighbors(i, j);
+              if (grid[i][j] === 0) {
+                  if (neighbors1 === 3) {
+                    grid2[i][j] = 1; // A dead cell with exactly 3 neighbors becomes alive
+                }
+              } else {
+                 if (neighbors1 < 2 || neighbors1 > 3) {
+                    grid2[i][j] = 0; // A live cell with fewer than 2 or more than 3 neighbors dies
+                }
+            }
+        }
+    }
+    grid = grid2; // Update the original grid
+    display(); // Update the display
+        }
+        intervalID = setInterval(simulate, 1000 / lastSpeed)
+
+    </script>
+</body>
+</html>
