@@ -174,6 +174,7 @@
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
         // Select the canvas and button
         const canvas = document.getElementById('myCanvas');
         const ctx = canvas.getContext('2d');
@@ -190,6 +191,15 @@
         var lastSpeed = 8; // Last valid height
         document.getElementById('speed').value = 8
 
+        var param1 = 0;
+        var param2 = 0;
+        var param3 = 0;
+        var param4 = 0;
+        var param5 = 0;
+        var param6 = 0;
+        var param7 = 0;
+        var param8 = 0;
+
         //Parameter constants
         const label1 = document.getElementById('paramLabel1');
         const textbox1 = document.getElementById('par1');
@@ -197,7 +207,7 @@
         const label2 = document.getElementById('paramLabel2');
         const textbox2 = document.getElementById('par2');
 
-        const label3 = document.getElementById('paramLabel13');
+        const label3 = document.getElementById('paramLabel3');
         const textbox3 = document.getElementById('par3');
 
         const label4 = document.getElementById('paramLabel4');
@@ -217,10 +227,37 @@
 
         canvas.width = lastCellSize * lastWidth
         canvas.height = lastCellSize * lastHeight
+
         //Math.round(Math.random(1))
         //canvas.width
         //eval()
         //parseInt(document.getElementById('size').value);
+        var colours = ["rgb(255, 255, 255", "rgb(0, 0, 0)", "rgb(60, 60, 60)", "rgb(120, 120, 120)", "rgb(180, 180, 180)", "rgb(240, 240, 240)"];
+
+        let ranItirations = 0;
+let ranNums = [];
+
+// Pre-generate random numbers
+function generateRandomNumbers(count) {
+    ranNums = [];
+    for (let i = 0; i < count; i++) {
+        ranNums.push(Math.random());
+    }
+}
+
+function getRanNum() {
+    // Reset iteration if we're near the end of the array
+    if (ranItirations >= ranNums.length - 10) {
+        ranItirations = 0;
+    }
+
+    // Return and increment
+    return ranNums[ranItirations++];
+}
+
+// Initialize with 10 million random numbers
+generateRandomNumbers(50000000);
+
         var intervalID = ""
 
         var grid = new Array(32); // rows
@@ -229,21 +266,78 @@
          grid[i] = new Array(32).fill(0); // colloms
 }
 
-        function drawGrid(width, height) {
+        function divVisability(numb)  {
+            label1.style.display = 'none';
+            label2.style.display = 'none';
+            label3.style.display = 'none';
+            label4.style.display = 'none';
+            label5.style.display = 'none';
+            label6.style.display = 'none';
+            label7.style.display = 'none';
+            label8.style.display = 'none';
+
+            textbox1.style.display = 'none';
+            textbox2.style.display = 'none';
+            textbox3.style.display = 'none';
+            textbox4.style.display = 'none';
+            textbox5.style.display = 'none';
+            textbox6.style.display = 'none';
+            textbox7.style.display = 'none';
+            textbox8.style.display = 'none';
+
+            if (numb > 0) {
+                label1.style.display = 'block';
+                textbox1.style.display = 'block';
+            }
+            if (numb > 1) {
+                label2.style.display = 'block';
+                textbox2.style.display = 'block';
+            }
+            if (numb > 2) {
+                label3.style.display = 'block';
+                textbox3.style.display = 'block';
+            }
+            if (numb > 3) {
+                label4.style.display = 'block';
+                textbox4.style.display = 'block';
+            }
+            if (numb > 4) {
+                label5.style.display = 'block';
+                textbox5.style.display = 'block';
+            }
+            if (numb > 5) {
+                label6.style.display = 'block';
+                textbox6.style.display = 'block';
+            }
+            if (numb > 6) {
+                label7.style.display = 'block';
+                textbox7.style.display = 'block';
+            }
+            if (numb > 7) {
+                label8.style.display = 'block';
+                textbox8.style.display = 'block';
+            }
+
+        }
+
+        divVisability(0);
+
+        function drawGrid(width, height, sim) {
              grid = new Array(width);
              for (let i = 0; i < width; i++) {
                  grid[i] = new Array(height).fill(0);
+                 if (sim == "conway") {
                     for (let j = 0; j < height; j++) {
-                        grid[i][j] = Math.round(Math.random());
-                      }
+                        grid[i][j] = Math.round(getRanNum());
+                 }
+                    
+                }
                }
            display(); // Call display to render the initial grid
         }
 
         // Add an event listener for the select
-        selectElement.addEventListener('change', function() {            
-
-            if (0 < parseInt(document.getElementById('size').value) && 0 < parseInt(document.getElementById('height').value) && 0 < parseInt(document.getElementById('width').value) && 0 < parseInt(document.getElementById('speed').value)) {
+        selectElement.addEventListener('change', function() {
 
                 lastCellSize = parseInt(document.getElementById('size').value);
                 lastWidth = parseInt(document.getElementById('width').value);
@@ -258,11 +352,34 @@
                 }
                 intervalID = setInterval(simulate, 1000 / lastSpeed);
 
-                drawGrid(lastWidth, lastHeight)
+                const selectedValue = selectElement.value; // Get the selected value
 
-                //drawGrid(newWidth, newHeight)
+                drawGrid(lastWidth, lastHeight, selectedValue)
+
+                //drawGrid(newWidth, newHeight);
+
+                if (selectedValue == "conway") {
+                    divVisability(0);
+                    colours = ["rgb(255, 255, 255", "rgb(0, 0, 0)", "rgb(60, 60, 60)", "rgb(120, 120, 120)", "rgb(180, 180, 180)", "rgb(240, 240, 240)"];
+                }
+                if (selectedValue == "Fire") {
+                    divVisability(4);
+                    label1.innerHTML = 'Growth chance';
+                    textbox1.value = 0.02;
+                    param1 = 0.02;
+                    label2.innerHTML = 'Spread chance';
+                    textbox2.value = 0.8;
+                    param2 = 0.8;
+                    label3.innerHTML = 'Fire die chance';
+                    textbox3.value = 0.5;
+                    param3 = 0.5;
+                    label4.innerHTML = 'Fire start chance';
+                    textbox4.value = 0.0003;
+                    param4 = 0.0003;
+                    colours = ["rgb(255, 255, 255", "rgb(100, 200, 60)", "rgb(253, 104, 68)", "rgb(250, 205, 100)", "rgb(254, 245, 178)"];
+                }
             }
-        });
+        );
 
 
         // Add an event listener for the button click
@@ -284,14 +401,21 @@
                 }
                 intervalID = setInterval(simulate, 1000 / lastSpeed);
 
-                drawGrid(lastWidth, lastHeight)
+                const selectedValue = selectElement.value;
+
+                drawGrid(lastWidth, lastHeight, selectedValue)
+
+                param1 = textbox1.value;
+                param2 = textbox2.value;
+                param3 = textbox3.value;
+                param4 = textbox4.value;
 
                 //drawGrid(newWidth, newHeight)
             }
         });
 
         function drawCell(x, y, size, id) {
-            let colours = ["rgb(255, 255, 255", "rgb(0, 0, 0)", "rgb(60, 60, 60)", "rgb(120, 120, 120)", "rgb(180, 180, 180)", "rgb(240, 240, 240)"]
+
             ctx.fillStyle = colours[id]
             ctx.fillRect(x, y, size, size);
         }
@@ -330,17 +454,20 @@
             return num;
         }
 
-        drawGrid(lastWidth, lastHeight);
+        drawGrid(lastWidth, lastHeight, "conway");
 
         function simulate() {
+            10000000
+
             let grid2 = grid.map(row => row.slice());
             for (let j = 0; j < lastHeight; j++) {
                for (let i = 0; i < lastWidth; i++) {
               let neighbors1 = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
               const selectedValue = selectElement.value;
-              getNeighbors(i,j,neighbors1);
+              
                 if (selectedValue == "conway") {
             //////////////////////////////////////////
+            getNeighbors(i,j,neighbors1);
 
               if (grid[i][j] === 0 || grid[i][j] === 2 || grid[i][j] === 3 || grid[i][j] === 4 || grid[i][j] === 5) { //Dead
                   if (neighbors1[1] === 3) {
@@ -408,13 +535,78 @@
                 }
                          
         }
-    }
+                 if (selectedValue == "Fire") {
+                    //////////////////////////////////////////
+
+              if (grid[i][j] === 0) { //Dead
+                  if (getRanNum() < param1) {
+                    grid2[i][j] = 1; // A dead cell with exactly 3 neighbors becomes alive
+                    }
+                }
+
+              
+              
+              
+              //else  //Live
+                if (grid[i][j] === 1) {
+                    //getNeighbors(i,j,neighbors1);
+                    if (Math.random() < param4) {
+                        grid2[i][j] = 2;
+                    } 
+                    if (Math.random() < param2 && neighbors1[2] > 0) {
+                        grid2[i][j] = 2;
+                    }   
+                }
+            
+
+             // Handle burning cells
+                if (grid[i][j] === 2) { // Burning
+                    // Spread fire to neighboring cells
+                    for (let xx = -1; xx <= 1; xx++) {
+                        for (let yy = -1; yy <= 1; yy++) {
+                            if (xx === 0 && yy === 0) continue; // Skip the cell itself
+                            const neighborX = i + xx;
+                            const neighborY = j + yy;
+                            if (neighborX >= 0 && neighborX < lastWidth && neighborY >= 0 && neighborY < lastHeight) {
+                                if (grid[neighborX][neighborY] === 1) { // If neighbor is alive
+                                    if (getRanNum() < param2) {
+                                        grid2[neighborX][neighborY] = 2; // Spread fire
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (getRanNum() < param3) {
+                        grid2[i][j] = 3;
+                    }   
+                }
+
+
+                     //else  //three
+                if (grid[i][j] === 3) {
+                    if (getRanNum() < param3) {
+                        grid2[i][j] = 4;
+                    }                    
+                }
+
+
+
+                //else  //four
+                if (grid[i][j] === 4) {
+                    if (getRanNum() < param3) {
+                        grid2[i][j] = 0;
+                    }                    
+                }
+                    
+                }
+        }
+        
     }
     grid = grid2; // Update the original grid
     display(); // Update the display
         }
         intervalID = setInterval(simulate, 1000 / lastSpeed)
-
+    });
     </script>
 </body>
 </html>
